@@ -1,0 +1,33 @@
+*{
+    box-sizing: border-box;
+}
+
+body{
+    font-family: 'Raleway', sans-serif;
+}
+
+h1{
+    font-family: 'Alfa Slab One', cursive;
+}
+
+header{
+    height: 80px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+input, label{
+    display: inline-block;
+}
+
+main{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+legend{
+    font-weight: 700;
+}

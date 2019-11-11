@@ -140,7 +140,7 @@ function generateQuestionOptions(item){
     for(let i=0; i<item.options.length; i++){
         $('form').append(`
             <input type="radio" name="option${i}-q${questionNumber}" id="option${i}-q${questionNumber}" value="${i}">
-            <label for="option${i}-q${questionNumber}">${item.options[i]}</label>
+            <label for="option${i}-q${questionNumber}">${item.options[i]}</label><br>
         `)
     }
     $('form').append('<button class="submit">Enter</button>')
