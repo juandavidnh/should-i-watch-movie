@@ -1,5 +1,12 @@
 'use strict';
 
+const moviedbAPI = {
+    apiKey: "6184c60592c9e705562804eb21c2f397",
+    baseURL: "https://api.themoviedb.org/3",
+    querySort: "sort_by=vote_average.desc",
+    endPoint: "/discover/movie",
+}
+
 const STORE = [
     {
         //1
@@ -113,6 +120,16 @@ const SCORE = {
         adventurous: 0,
         thrillSeeking: 0,
     },
+    multipliers:{
+        innovative: 1/7,
+        fun: 1/7,
+        traditional: 1/7,
+        dramatic: 1/6,
+        romantic: 1/6,
+        weird: 1/5,
+        adventurous: 1/5,
+        thrillSeeking: 1/5,
+    },
     avgMovieScore: 0,  
 };
 
@@ -121,7 +138,7 @@ const GENRES = {
     fun: [35, 16],
     traditional: [99, 37, 10751],
     dramatic: [18, 36, 9648],
-    romantic: 10749,
+    romantic: [10749],
     weird: [10770, 10402],
     adventurous: [12, 28, 10752],
     thrillSeeking: [80, 27, 53],
@@ -139,11 +156,11 @@ function generateQuestionOptions(item){
         `)
     for(let i=0; i<item.options.length; i++){
         $('form').append(`
-            <input type="radio" name="option${i}-q${questionNumber}" id="option${i}-q${questionNumber}" value="${i}">
+            <input type="radio" name="q${questionNumber}" id="option${i}-q${questionNumber}" value="${i}">
             <label for="option${i}-q${questionNumber}">${item.options[i]}</label><br>
         `)
     }
-    $('form').append('<button class="submit">Enter</button>')
+    $('form').append('<button class="submit" type="submit">Enter</button>')
 }
 
 
@@ -180,10 +197,52 @@ function renderQuestionOptions(){
             questionNumber++;
         }else{
             $("body").html(generateFinalScreen());
+            fetchMovies();
         }
     })
 }
 
+function assignWinner(){
+    let dominantTrait = "innovative";
+    for(let i=0; i<traitKeys.length; i++){
+        if(SCORE.traits[traitKeys[i]]*SCORE.multipliers[traitKeys[i]] > SCORE.traits[dominantTrait]*SCORE.multipliers[dominantTrait]){
+            dominantTrait = traitKeys[i];
+            //return dominantTrait;
+        }
+    }
+    console.log(dominantTrait);
+    return dominantTrait;
+}
+
+function determineGenre(dominantTrait){
+    let genreArray = GENRES[dominantTrait];
+    console.log(genreArray.join(","));
+    return genreArray.join(",");
+}
+
+
+function fetchMovies(){
+    let genres = determineGenre(assignWinner());
+    let url = moviedbAPI.baseURL + moviedbAPI.endPoint + "?" + moviedbAPI.querySort + "&" + "api_key=" + moviedbAPI.apiKey + "&with_genres=" + genres + "&page=1&vote_count.gte=500";
+    console.log(url);
+    fetch(url)
+    .then(response => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error(response.statusText);
+      })
+    .then(responseJson => console.log(responseJson))
+    ;
+}
+
+function displayResults(responseJson){
+    let randomMovie = Math.ceil(Math.random()*20);
+    $('body').html(`
+            
+    `)
+}
 
 $(renderQuestionOptions);
+
 
