@@ -31,3 +31,7 @@ main{
 legend{
     font-weight: 700;
 }
+
+.streaming{
+    display:none;
+}

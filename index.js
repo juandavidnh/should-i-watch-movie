@@ -7,6 +7,13 @@ const moviedbAPI = {
     endPoint: "/discover/movie",
 }
 
+const utelly = {
+    rapidApiKey: "66fdf336cemsh75959c453beef6fp1fff5fjsneffb5f55a399",
+    baseURL:"https://utelly-tv-shows-and-movies-availability-v1.p.rapidapi.com",
+    endPoint: "/lookup",
+    country: "country=us",
+}
+
 const STORE = [
     {
         //1
@@ -232,16 +239,65 @@ function fetchMovies(){
         }
         throw new Error(response.statusText);
       })
-    .then(responseJson => console.log(responseJson))
-    ;
+    .then(responseJson => displayResults(responseJson));
 }
 
+function fetchStreaming(movieTitle){
+    let uriMovie= encodeURIComponent(movieTitle);
+    let url = utelly.baseURL + utelly.endPoint + "?rapidapi-key=" + utelly.rapidApiKey + "&" + utelly.country + "&term=" + uriMovie;
+    fetch(url)
+    .then(response => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error(response.statusText);
+      })
+    .then(responseJson => displayStreaming(responseJson));
+}
+
+
 function displayResults(responseJson){
-    let randomMovie = Math.ceil(Math.random()*20);
+    let randomMovie = Math.floor(Math.random()*responseJson.results.length);
+    console.log(randomMovie);
+    let title = responseJson.results[randomMovie].title;
+    console.log(title);
+    let image = "http://image.tmdb.org/t/p/w185//" + responseJson.results[randomMovie].poster_path;
+    console.log(image);
     $('body').html(`
-            
+    <main>
+        <h1>Should I Watch This Movie?</h1>
+        <h2 class="movie-title">${title}</h2>
+        <section class = "movie-poster">
+            <img src="${image}" alt="movie-poster">
+        </section>
+        <section class="score">
+            <p><strong>iMDB Score:</strong> ${responseJson.results[randomMovie].vote_average}</p>
+        </section>
+        <section class="overview">
+            <p><strong>Overview:</strong> ${responseJson.results[randomMovie].overview}</p>
+        </section>
+    </main>
     `)
 }
+
+function displayStreaming(responseJson){
+    if(!Array.isArray(responseJson.results) || !responseJson.results.length){
+        $('main').append(`
+            <section class="streaming">
+                <h3>Unfortunately, we couldn't find any site streaming this movie.</h3>
+            </section>
+        `)
+    }
+    else{
+        for(let i=0; i<responseJson.results[0].locations.length; i++){
+            $('.streaming-list').append(`
+                <li class="streaming-item"><a href="${responseJson.results[0].locations[i].url}" target="_blank"><img src="${responseJson.results[0].locations[i].icon}" alt="streaming-icon-${i}"></a></li>
+            `)
+        }
+    }
+}
+
+
 
 $(renderQuestionOptions);
 
