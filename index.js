@@ -183,7 +183,7 @@ function assignScore(item, input){
 
 
 function renderQuestionOptions(){
-    $('main').on('click', 'button', function(e){
+    $('main').on('click', '.submit, .start', function(e){
         e.preventDefault();
         console.log('questionNumber: '+questionNumber);    
         let itemCurrent = STORE[questionNumber];
@@ -203,6 +203,8 @@ function renderQuestionOptions(){
         }else{
             //$("body").html(generateFinalScreen());
             fetchMovies();
+            startOver();
+
         }
     })
 }
@@ -237,7 +239,8 @@ function fetchMovies(){
         }
         throw new Error(response.statusText);
       })
-    .then(responseJson => displayResults(responseJson));
+    .then(responseJson => displayResults(responseJson))
+    .catch(err => alert(`Something went wrong: ${err.message}`));
 }
 
 function fetchStreaming(movieTitle){
@@ -252,7 +255,8 @@ function fetchStreaming(movieTitle){
         }
         throw new Error(response.statusText);
       })
-    .then(responseJson => displayStreaming(responseJson, uriMovie));
+    .then(responseJson => displayStreaming(responseJson, uriMovie))
+    .catch(err => alert(`Something went wrong: ${err.message}`));
 }
 
 
@@ -283,8 +287,8 @@ function displayResults(responseJson){
     <section class="buttons">
         <button class="start-over">Start Over</button>
     </section>
-    `)
-    startOver();
+    `);
+    
 }
 
 function displayStreaming(responseJson, uriTitle){
@@ -316,6 +320,12 @@ function startOver(){
     
 }
 
+/*function newMovie(){
+    $('.buttons').on('click', '.new-movie', function(e){
+        e.preventDefault();
+        fetchMovies();
+    });
+}*/
 
 
 
