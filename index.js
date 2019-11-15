@@ -204,6 +204,7 @@ function renderQuestionOptions(){
             //$("body").html(generateFinalScreen());
             fetchMovies();
             startOver();
+            newMovie();
 
         }
     })
@@ -286,6 +287,7 @@ function displayResults(responseJson){
     $('main').append(`
     <section class="buttons">
         <button class="start-over">Start Over</button>
+        <button class="new-movie">New Movie</button>
     </section>
     `);
     
@@ -299,7 +301,8 @@ function displayStreaming(responseJson, uriTitle){
                 <h3>Unfortunately, we couldn't find any site streaming this movie.</h3>     
                 <p><a href="http://www.google.com/search?q=${uriTitle}" target="_blank">Search on Google</a></p>
             </section>
-        `)
+        `);
+        $('.streaming').css('display', 'none');
     }
     else{
         for(let i=0; i<responseJson.results[0].locations.length; i++){
@@ -307,7 +310,7 @@ function displayStreaming(responseJson, uriTitle){
                 <li class="streaming-item"><a href="${responseJson.results[0].locations[i].url}" target="_blank"><img src="${responseJson.results[0].locations[i].icon}" alt="streaming-icon-${i}"></a></li>
             `)
         }
-        $('.streaming').removeClass("hidden");
+        $('.streaming').css('display', 'block');
     }
     
 }
@@ -320,12 +323,13 @@ function startOver(){
     
 }
 
-/*function newMovie(){
-    $('.buttons').on('click', '.new-movie', function(e){
+function newMovie(){
+    $('main').on('click', '.new-movie', function(e){
         e.preventDefault();
+        $('.buttons, .streaming-list li').remove();
         fetchMovies();
     });
-}*/
+}
 
 
 

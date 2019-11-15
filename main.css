@@ -94,8 +94,18 @@ h2{
     font-weight: 700;
 }
 
+h3{
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
 .explanation{
     margin-top: 20px;
+}
+
+.streaming{
+    display: none;
 }
 
 @media screen and (min-width: 600px){
