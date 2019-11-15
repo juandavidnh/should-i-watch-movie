@@ -163,8 +163,10 @@ function generateQuestionOptions(item){
         `)
     for(let i=0; i<item.options.length; i++){
         $('form').append(`
-            <input type="radio" name="q${questionNumber}" id="option${i}-q${questionNumber}" value="${i}">
+        <div class="question">
+            <input type="radio" name="q${questionNumber}" id="option${i}-q${questionNumber}" value="${i}" required>
             <label for="option${i}-q${questionNumber}">${item.options[i]}</label><br>
+        </div>
         `)
     }
     $('form').append('<button class="submit" type="submit">Enter</button>')
@@ -203,7 +205,7 @@ function renderQuestionOptions(){
             }
             questionNumber++;
         }else{
-            $("body").html(generateFinalScreen());
+            //$("body").html(generateFinalScreen());
             fetchMovies();
         }
     })
@@ -223,13 +225,13 @@ function assignWinner(){
 
 function determineGenre(dominantTrait){
     let genreArray = GENRES[dominantTrait];
-    console.log(genreArray.join(","));
-    return genreArray.join(",");
+    return genreArray.join("|");
 }
 
 
 function fetchMovies(){
     let genres = determineGenre(assignWinner());
+    console.log(genres);
     let url = moviedbAPI.baseURL + moviedbAPI.endPoint + "?" + moviedbAPI.querySort + "&" + "api_key=" + moviedbAPI.apiKey + "&with_genres=" + genres + "&page=1&vote_count.gte=500";
     console.log(url);
     fetch(url)
@@ -244,7 +246,9 @@ function fetchMovies(){
 
 function fetchStreaming(movieTitle){
     let uriMovie= encodeURIComponent(movieTitle);
+    console.log(uriMovie);
     let url = utelly.baseURL + utelly.endPoint + "?rapidapi-key=" + utelly.rapidApiKey + "&" + utelly.country + "&term=" + uriMovie;
+    console.log(url);
     fetch(url)
     .then(response => {
         if (response.ok) {
@@ -263,9 +267,8 @@ function displayResults(responseJson){
     console.log(title);
     let image = "http://image.tmdb.org/t/p/w185//" + responseJson.results[randomMovie].poster_path;
     console.log(image);
-    $('body').html(`
-    <main>
-        <h1>Should I Watch This Movie?</h1>
+    $('main').html(`
+    <section class="movie-result">
         <h2 class="movie-title">${title}</h2>
         <section class = "movie-poster">
             <img src="${image}" alt="movie-poster">
@@ -276,15 +279,19 @@ function displayResults(responseJson){
         <section class="overview">
             <p><strong>Overview:</strong> ${responseJson.results[randomMovie].overview}</p>
         </section>
-    </main>
-    `)
+        <h2>Stream it on:</h2>
+    </section>
+    `);
+    fetchStreaming(title);
 }
 
 function displayStreaming(responseJson){
+    
     if(!Array.isArray(responseJson.results) || !responseJson.results.length){
-        $('main').append(`
+        $('.movie-result').append(`
             <section class="streaming">
                 <h3>Unfortunately, we couldn't find any site streaming this movie.</h3>
+
             </section>
         `)
     }
@@ -295,6 +302,7 @@ function displayStreaming(responseJson){
             `)
         }
     }
+    $('.streaming').removeClass("hidden");
 }
 
 
