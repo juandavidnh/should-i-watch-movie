@@ -164,7 +164,7 @@ function generateQuestionOptions(item){
     for(let i=0; i<item.options.length; i++){
         $('form').append(`
         <div class="question">
-            <input type="radio" name="q${questionNumber}" id="option${i}-q${questionNumber}" value="${i}" required>
+            <input type="radio" name="q${questionNumber}" id="option${i}-q${questionNumber}" value="${i}" required checked>
             <label for="option${i}-q${questionNumber}">${item.options[i]}</label><br>
         </div>
         `)
@@ -179,10 +179,6 @@ function assignScore(item, input){
     SCORE.traits[traitName]++;
     console.log(SCORE.traits);
     console.log(traitName);
-}
-
-function generateFinalScreen(){
-    return `<h1>What Should I Watch?</h1>`;
 }
 
 
@@ -256,7 +252,7 @@ function fetchStreaming(movieTitle){
         }
         throw new Error(response.statusText);
       })
-    .then(responseJson => displayStreaming(responseJson));
+    .then(responseJson => displayStreaming(responseJson, uriMovie));
 }
 
 
@@ -267,7 +263,8 @@ function displayResults(responseJson){
     console.log(title);
     let image = "http://image.tmdb.org/t/p/w185//" + responseJson.results[randomMovie].poster_path;
     console.log(image);
-    $('main').html(`
+    
+    $('.submain').html(`
     <section class="movie-result">
         <h2 class="movie-title">${title}</h2>
         <section class = "movie-poster">
@@ -279,19 +276,24 @@ function displayResults(responseJson){
         <section class="overview">
             <p><strong>Overview:</strong> ${responseJson.results[randomMovie].overview}</p>
         </section>
-        <h2>Stream it on:</h2>
     </section>
     `);
     fetchStreaming(title);
+    $('main').append(`
+    <section class="buttons">
+        <button class="start-over">Start Over</button>
+    </section>
+    `)
+    startOver();
 }
 
-function displayStreaming(responseJson){
+function displayStreaming(responseJson, uriTitle){
     
     if(!Array.isArray(responseJson.results) || !responseJson.results.length){
         $('.movie-result').append(`
-            <section class="streaming">
-                <h3>Unfortunately, we couldn't find any site streaming this movie.</h3>
-
+            <section class="streaming-null">
+                <h3>Unfortunately, we couldn't find any site streaming this movie.</h3>     
+                <p><a href="http://www.google.com/search?q=${uriTitle}" target="_blank">Search on Google</a></p>
             </section>
         `)
     }
@@ -301,9 +303,19 @@ function displayStreaming(responseJson){
                 <li class="streaming-item"><a href="${responseJson.results[0].locations[i].url}" target="_blank"><img src="${responseJson.results[0].locations[i].icon}" alt="streaming-icon-${i}"></a></li>
             `)
         }
+        $('.streaming').removeClass("hidden");
     }
-    $('.streaming').removeClass("hidden");
+    
 }
+
+function startOver(){
+    $('main').on('click', '.start-over', function(e){
+        e.preventDefault();
+        window.location.reload(true);
+    })
+    
+}
+
 
 
 
