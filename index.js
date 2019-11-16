@@ -140,15 +140,15 @@ const SCORE = {
     avgMovieScore: 0,  
 };
 
-const GENRES = {
-    innovative : [14, 878],
-    fun: [35, 16],
-    traditional: [99, 37, 10751],
-    dramatic: [18, 36, 9648],
-    romantic: [10749],
-    weird: [10770, 10402],
-    adventurous: [12, 28, 10752],
-    thrillSeeking: [80, 27, 53],
+const KEYWORDS = {
+    innovative : [190329, 310, 490, 312, 3222, 1576, 3307, 3298, 11440, 207257, 4379, 163561,208807, 243957, 243950,3519 ,4286, 162988, 252635, 253322],
+    fun: [258614, 258785, 155722, 11931, 236316, 9963, 18425, 160362, 3205, 186120, 177972, 215200, 9717, 180547, 4344, 256791, 4325, 167213, 9716, 185281],
+    traditional: [210543, 222820, 236667, 5783, 10511, 156212, 1627, 6091, 3587, 207876, 156028, 179585, 230457, 3136, 4107, 186, 1405, 3036, 1394, 5049],
+    dramatic: [11268, 222, 2462, 188860, 196110, 207114, 214780, 34094, 1599, 970, 219903, 1739, 10683, 164296, 1523, 170418, 240315, 14549, 159315, 223609],
+    romantic: [233027, 247745, 257236, 4516, 9799, 40798, 182349, 208793, 221890, 234191, 238251, 239144, 239561, 241637, 240305, 244886, 247643, 248512, 156038, 173137],
+    weird: [3260, 9719, 163699, 202882, 9887, 7089, 158713, 33841, 172658, 155678, 156546, 241980, 985, 2117, 162345, 162346, 256059, 166467, 196861, 251847],
+    adventurous: [253675, 258331, 163441, 256524, 247784, 250925, 9715, 10843, 1454, 6956, 83, 4776, 219404, 10562, 3713, 849, 33637, 853, 11107, 163295],
+    thrillSeeking: [8087, 50009, 192856, 12565, 1930, 10092, 6259, 13112, 155790, 5340, 2620, 9826, 3879, 11134, 1568, 10291, 33421, 166462, 157171, 9665],
 }
 
 let questionNumber = 0;
@@ -222,16 +222,16 @@ function assignWinner(){
     return dominantTrait;
 }
 
-function determineGenre(dominantTrait){
-    let genreArray = GENRES[dominantTrait];
+function determineTrait(dominantTrait){
+    let genreArray = KEYWORDS[dominantTrait];
     return genreArray.join("|");
 }
 
 
 function fetchMovies(){
-    let genres = determineGenre(assignWinner());
-    console.log(genres);
-    let url = moviedbAPI.baseURL + moviedbAPI.endPoint + "?" + moviedbAPI.querySort + "&" + "api_key=" + moviedbAPI.apiKey + "&with_genres=" + genres + "&page=1&vote_count.gte=500";
+    let winningTrait = determineTrait(assignWinner());
+    console.log(winningTrait);
+    let url = moviedbAPI.baseURL + moviedbAPI.endPoint + "?" + moviedbAPI.querySort + "&" + "api_key=" + moviedbAPI.apiKey + "&with_keywords=" + winningTrait + "&page=1&vote_count.gte=500";
     console.log(url);
     fetch(url)
     .then(response => {
