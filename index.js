@@ -161,10 +161,16 @@ function generateQuestionOptions(item){
     $('form').html(`
         <legend class="question-${questionNumber}">${item.question}</legend>
         `)
-    for(let i=0; i<item.options.length; i++){
+    $('form').append(`
+        <div class="question">
+            <input type="radio" name="q${questionNumber}" id="option${0}-q${questionNumber}" value="${0}" required checked>
+            <label for="option${0}-q${questionNumber}">${item.options[0]}</label><br>
+        </div>
+        `)
+    for(let i=1; i<item.options.length; i++){
         $('form').append(`
         <div class="question">
-            <input type="radio" name="q${questionNumber}" id="option${i}-q${questionNumber}" value="${i}" required checked>
+            <input type="radio" name="q${questionNumber}" id="option${i}-q${questionNumber}" value="${i}" required>
             <label for="option${i}-q${questionNumber}">${item.options[i]}</label><br>
         </div>
         `)
@@ -284,11 +290,9 @@ function displayResults(responseJson){
     </section>
     `);
     fetchStreaming(title);
-    $('main').append(`
-    <section class="buttons">
+    $('.final-buttons').append(`
         <button class="start-over">Start Over</button>
         <button class="new-movie">New Movie</button>
-    </section>
     `);
     
 }
@@ -326,7 +330,8 @@ function startOver(){
 function newMovie(){
     $('main').on('click', '.new-movie', function(e){
         e.preventDefault();
-        $('.buttons, .streaming-list li').remove();
+        //$('.buttons, .streaming-list li').remove();
+        $('.streaming-list, .final-buttons').empty();
         fetchMovies();
     });
 }

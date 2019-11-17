@@ -9,6 +9,8 @@ body{
 
 h1{
     font-family: 'Alfa Slab One', cursive;
+    text-shadow: 1.5px 1.5px #380808;
+    
 }
 
 header{
@@ -17,19 +19,15 @@ header{
     flex-direction: row;
     justify-content: center;
     align-items: center;
+    background-color: #fa320a;
+    color: white;
 }
 
 input, label{
     display: inline-block;
 }
 
-main{
-    /*display: flex;
-    flex-direction: row;
-    justify-content: center;*/
-    padding-left: 30px;
-    padding-right: 30px;
-}
+
 
 legend{
     font-weight: 700;
@@ -46,9 +44,16 @@ legend{
 }
 
 button{
-    margin-top: 40px;
+    margin-top: 20px;
     width: 100px;
     height: 40px;
+    background-color: #1C51C7;
+    color: white;
+    border-radius: 20px;
+    font-size: 15px;
+    font-weight: bold;
+    letter-spacing:1.3px;
+    border: none;
 }
 
 p{
@@ -86,6 +91,7 @@ input[type="radio"]{
 
 legend{
     margin-bottom: 20px;
+    margin-top: 20px;
 }
 
 h2{
@@ -108,13 +114,153 @@ h3{
     display: none;
 }
 
+.hero{
+    padding: 10% 30px;
+    background: url('media/2001-space_wide.png');
+    background-size: cover;
+    color: white;
+    text-shadow: 1.5px 1.5px #380808;
+
+}
+
+.instructions{
+    padding: 5% 30px;
+    line-height: 24px;
+}
+
+form{
+    padding-right: 30px;
+    padding-left: 30px;
+}
+
+.movie-result{
+    padding-left: 30px;
+    padding-right: 30px;
+}
+
+.overview{
+    text-align: left;
+    margin-top: 20px;
+    line-height: 20px;
+}
+
+strong{
+    font-weight: bold;
+}
+
+.movie-title{
+    font-size: 25px;
+    line-height: 40px;
+}
+
+.final-buttons button{
+    width: 140px;
+    height: 45px;
+    border-radius: 45px;
+    margin-right: 3px;
+    margin-left: 3px;
+
+}
+
+.final-buttons{
+    padding-bottom: 30px;
+}
+
+main{
+    padding-bottom: 100px;
+}
+
+footer{
+    background-color: #1041AD;
+    color: white;
+    padding: 5% 30px;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    font-size: 10px;
+}
+
+footer a{
+
+    color: white;
+}
+
+footer h3{
+    margin: 0 0 20px 0;
+    font-size: 14px;
+    
+}
+
+
 @media screen and (min-width: 600px){
+    h1{
+        font-size: 25px; 
+    }
+
+    .hero{
+        font-size: 23px;
+        line-height: 30px;
+    }
+
+    header{
+        height: 110px;
+    }
+
     input[type="radio"]{
         flex-basis: 10%;
     }
+
     label{
         flex-basis: 40%;
+        font-size: 17px;
+        line-height: 23px;
     }
+
+    .explanation{
+        font-size: 18px;
+        line-height: 25px;
+    }
+
+    button{
+        height: 50px;
+        width: 150px;
+        letter-spacing: 4px;
+        font-size: 17px;
+        border-radius: 50px;
+    }
+
+    legend{
+        font-size: 20px;
+        line-height: 35px;
+    }
+
+    .final-buttons button{
+        width: 180px;
+        height: 50px;
+        border-radius: 50px;
+        margin-right: 3px;
+        margin-left: 3px;
+    
+    }
+
+    footer{
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        padding: 4% 30px;
+
+    }
+
+    footer h3{
+        margin-right: 10px;
+    }
+
+    footer ul{
+        margin-left: 10px;
+    }
+
+
 }
 
 @media screen and (min-width: 1000px){
@@ -123,5 +269,15 @@ h3{
     }
     label{
         flex-basis: 25%;
+    }
+
+    .overview{
+        margin: 0 30%;
+        font-size: 17px;
+        line-height: 25px;
+    }
+
+    footer{
+        padding: 2% 30px;
     }
 }
