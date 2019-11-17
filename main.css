@@ -170,11 +170,16 @@ main{
     padding-bottom: 100px;
 }
 
+html{
+    position: relative;
+    min-height: 100%;
+}
+
 footer{
     background-color: #1041AD;
     color: white;
     padding: 5% 30px;
-    position: fixed;
+    position: absolute;
     bottom: 0;
     right: 0;
     width: 100%;
