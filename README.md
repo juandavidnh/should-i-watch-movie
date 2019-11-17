@@ -1,4 +1,4 @@
-# Should I Watch This Movie
+# What Movie Should I Watch #
 * [Live App](https://juandavidnh.github.io/what-movie-to-watch/)
 ## Screenshots ##
 ![Image](media/home-screen.png)
