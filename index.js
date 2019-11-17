@@ -1,5 +1,6 @@
 'use strict';
 
+//Access credentials and base data for themoviedb.org API which we'll use to generate recommendation
 const moviedbAPI = {
     apiKey: "6184c60592c9e705562804eb21c2f397",
     baseURL: "https://api.themoviedb.org/3",
@@ -7,6 +8,7 @@ const moviedbAPI = {
     endPoint: "/discover/movie",
 }
 
+//Access credentials and base data for utelly API whick we'll use to generating streaming options list
 const utelly = {
     rapidApiKey: "66fdf336cemsh75959c453beef6fp1fff5fjsneffb5f55a399",
     baseURL:"https://utelly-tv-shows-and-movies-availability-v1.p.rapidapi.com",
@@ -14,6 +16,7 @@ const utelly = {
     country: "country=us",
 }
 
+//stores questionnaire and answer options. traitIndex will associates specific answer options with certain personnality trait
 const STORE = [
     {
         //1
@@ -117,6 +120,7 @@ const STORE = [
 ];
 
 const SCORE = {
+    //test answers will assign to a specific trait below
     traits: {
         innovative: 0,
         fun: 0,
@@ -127,6 +131,7 @@ const SCORE = {
         adventurous: 0,
         thrillSeeking: 0,
     },
+    //since max score for certain traits is different than others, multipliers will normalize each score
     multipliers:{
         innovative: 1/7,
         fun: 1/7,
@@ -137,10 +142,10 @@ const SCORE = {
         adventurous: 1/5,
         thrillSeeking: 1/5,
     },
-    avgMovieScore: 0,  
 };
 
 const KEYWORDS = {
+    //moviedb has a list of keywords with a specific id for each. keyword ids related to each personality trait are stored in arrays.
     innovative : [190329, 310, 490, 312, 3222, 1576, 3307, 3298, 11440, 207257, 4379, 163561,208807, 243957, 243950,3519 ,4286, 162988, 252635, 253322],
     fun: [258614, 258785, 155722, 11931, 236316, 9963, 18425, 160362, 3205, 186120, 177972, 215200, 9717, 180547, 4344, 256791, 4325, 167213, 9716, 185281],
     traditional: [210543, 222820, 236667, 5783, 10511, 156212, 1627, 6091, 3587, 207876, 156028, 179585, 230457, 3136, 4107, 186, 1405, 3036, 1394, 5049],
@@ -151,22 +156,25 @@ const KEYWORDS = {
     thrillSeeking: [8087, 50009, 192856, 12565, 1930, 10092, 6259, 13112, 155790, 5340, 2620, 9826, 3879, 11134, 1568, 10291, 33421, 166462, 157171, 9665],
 }
 
+//questionNumber will keep track of questionnaire
 let questionNumber = 0;
 
+//traitKeys will be used to easily access traits within previous arrays
 const traitKeys = Object.keys(SCORE.traits);
 
-console.log(questionNumber);
-
+//for every question submission generate a new one by looking at valuew from STORE array
 function generateQuestionOptions(item){
     $('form').html(`
         <legend class="question-${questionNumber}">${item.question}</legend>
         `)
+    //append first radio option with 'checked' atrribute
     $('form').append(`
         <div class="question">
             <input type="radio" name="q${questionNumber}" id="option${0}-q${questionNumber}" value="${0}" required checked>
             <label for="option${0}-q${questionNumber}">${item.options[0]}</label><br>
         </div>
         `)
+    //iterate over rest of options without 'checked' attribute
     for(let i=1; i<item.options.length; i++){
         $('form').append(`
         <div class="question">
@@ -178,67 +186,39 @@ function generateQuestionOptions(item){
     $('form').append('<button class="submit" type="submit">Enter</button>')
 }
 
-
+//every time a question is submitted assignScore will be called to add 1 to the trait associated with the user selection
 function assignScore(item, input){
     let traitSelect = item.traitIndex[input];
     let traitName = traitKeys[traitSelect];
     SCORE.traits[traitName]++;
-    console.log(SCORE.traits);
-    console.log(traitName);
 }
 
-
-function renderQuestionOptions(){
-    $('main').on('click', '.submit, .start', function(e){
-        e.preventDefault();
-        console.log('questionNumber: '+questionNumber);    
-        let itemCurrent = STORE[questionNumber];
-        let itemPrev = STORE[questionNumber-1]
-        console.log('itemCurrent: '+itemCurrent); 
-        let choiceSelect = $('input[type=radio]:checked').attr('value');
-        console.log('choiceSelect: '+choiceSelect);
-        if(questionNumber < STORE.length){
-            $('.intro').empty();
-            if(questionNumber > 0){
-                generateQuestionOptions(itemCurrent);
-                assignScore(itemPrev, choiceSelect);
-            }else{
-                generateQuestionOptions(itemCurrent);    
-            }
-            questionNumber++;
-        }else{
-            //$("body").html(generateFinalScreen());
-            fetchMovies();
-            startOver();
-            newMovie();
-
-        }
-    })
-}
-
+//dominantTrait variable will store the trait with highest score after normalizing
 function assignWinner(){
     let dominantTrait = "innovative";
+    //function will be called after user submits each question
     for(let i=0; i<traitKeys.length; i++){
+        //if normalized score of selected trait is higher than normalized score of previous dominantTrait assign new dominantTrait
         if(SCORE.traits[traitKeys[i]]*SCORE.multipliers[traitKeys[i]] > SCORE.traits[dominantTrait]*SCORE.multipliers[dominantTrait]){
             dominantTrait = traitKeys[i];
-            //return dominantTrait;
         }
     }
-    console.log(dominantTrait);
+    //after each question return the current dominantTrait
     return dominantTrait;
 }
 
+//at the end of the quiz, generate a string of all keywords associated with winning trait
 function determineTrait(dominantTrait){
     let genreArray = KEYWORDS[dominantTrait];
     return genreArray.join("|");
 }
 
-
+//fetch json with movies associated with keywords belonging to trait with highest normalized score
 function fetchMovies(){
+    //winningTrait stores string of keywords associated with trait with highest normalized score
     let winningTrait = determineTrait(assignWinner());
-    console.log(winningTrait);
+    //generate query url with values within the moviedbAPI object and string of keywords associated with the winning trait
     let url = moviedbAPI.baseURL + moviedbAPI.endPoint + "?" + moviedbAPI.querySort + "&" + "api_key=" + moviedbAPI.apiKey + "&with_keywords=" + winningTrait + "&page=1&vote_count.gte=500";
-    console.log(url);
     fetch(url)
     .then(response => {
         if (response.ok) {
@@ -246,15 +226,19 @@ function fetchMovies(){
         }
         throw new Error(response.statusText);
       })
+    //call displayResults to appropriately put json elements in the DOM
     .then(responseJson => displayResults(responseJson))
+    //handle error response
     .catch(err => alert(`Something went wrong: ${err.message}`));
 }
 
+//fetch list of streaming sites where movie is available, takes movie title string as argument
 function fetchStreaming(movieTitle){
+    //store variable with movie title converted into URI component
     let uriMovie= encodeURIComponent(movieTitle);
-    console.log(uriMovie);
+    //create api query url with utelly object values and uri compatible movie title
     let url = utelly.baseURL + utelly.endPoint + "?rapidapi-key=" + utelly.rapidApiKey + "&" + utelly.country + "&term=" + uriMovie;
-    console.log(url);
+    //fetch json with streaming services playing movie.
     fetch(url)
     .then(response => {
         if (response.ok) {
@@ -266,15 +250,15 @@ function fetchStreaming(movieTitle){
     .catch(err => alert(`Something went wrong: ${err.message}`));
 }
 
-
+//taking javascript compatible json as an argument, place appropriate values into DOM
 function displayResults(responseJson){
+    //random movie stores a random index value that will be passed to retrieve an element within results array
     let randomMovie = Math.floor(Math.random()*responseJson.results.length);
-    console.log(randomMovie);
+    //store title of random results array element
     let title = responseJson.results[randomMovie].title;
-    console.log(title);
+    //store movie 
     let image = "http://image.tmdb.org/t/p/w185//" + responseJson.results[randomMovie].poster_path;
-    console.log(image);
-    
+    //place title, image, imdb score, and overview of random movie into the DOM
     $('.submain').html(`
     <section class="movie-result">
         <h2 class="movie-title">${title}</h2>
@@ -289,16 +273,36 @@ function displayResults(responseJson){
         </section>
     </section>
     `);
+    //pass title into fetchStreaming function which will generate a list of sites where the movie is streaming
     fetchStreaming(title);
+    //append buttons which will allow user to take the quiz again or get another random movie within their keyword array
     $('.final-buttons').append(`
         <button class="start-over">Start Over</button>
         <button class="new-movie">New Movie</button>
-    `);
-    
+    `);  
 }
 
+//reload web app on click of start-over button
+function startOver(){
+    $('main').on('click', '.start-over', function(e){
+        e.preventDefault();
+        window.location.reload(true);
+    })   
+}
+
+//render new movie data on click of new-movie button
+function newMovie(){
+    $('main').on('click', '.new-movie', function(e){
+        e.preventDefault();
+        $('.streaming-list, .final-buttons').empty();
+        fetchMovies();
+    });
+}
+
+/*render streaming links for recommended movie to DOM by taking utelly json response. 
+uri compatible movie title is also passed to search on Google in case results array returns empty*/
 function displayStreaming(responseJson, uriTitle){
-    
+    //if results array for streaming platforms returns empty, generate a link to search movie title on Google
     if(!Array.isArray(responseJson.results) || !responseJson.results.length){
         $('.movie-result').append(`
             <section class="streaming-null">
@@ -306,38 +310,55 @@ function displayStreaming(responseJson, uriTitle){
                 <p><a href="http://www.google.com/search?q=${uriTitle}" target="_blank">Search on Google</a></p>
             </section>
         `);
+        //hide streaming ul
         $('.streaming').css('display', 'none');
     }
     else{
+        //if results array is not empty append result to .streaming-list, a ul.
         for(let i=0; i<responseJson.results[0].locations.length; i++){
             $('.streaming-list').append(`
                 <li class="streaming-item"><a href="${responseJson.results[0].locations[i].url}" target="_blank"><img src="${responseJson.results[0].locations[i].icon}" alt="streaming-icon-${i}"></a></li>
             `)
         }
+        //show streaming ul
         $('.streaming').css('display', 'block');
-    }
-    
+    }   
 }
 
-function startOver(){
-    $('main').on('click', '.start-over', function(e){
+//calls appropriate functions to render content into DOM
+function renderToDom(){
+    $('main').on('click', '.submit, .start', function(e){
         e.preventDefault();
-        window.location.reload(true);
+        //store appropriate element within STORE by current questionNumber index
+        let itemCurrent = STORE[questionNumber];
+        //store previous STORE item to process user selection after button is clicked
+        let itemPrev = STORE[questionNumber-1];
+        //store value of user answer
+        let choiceSelect = $('input[type=radio]:checked').attr('value');
+        //iterate over STORE elements until the whole array is covered
+        if(questionNumber < STORE.length){
+            //reset screen
+            $('.intro').empty();
+            //after first quesiton has already shown, assign score for each answered question and render new question
+            if(questionNumber > 0){
+                generateQuestionOptions(itemCurrent);
+                assignScore(itemPrev, choiceSelect);
+            }
+            //render first question
+            else{
+                generateQuestionOptions(itemCurrent);    
+            }
+            questionNumber++;
+        }
+        //once all questions have been rendered, render final screen calling API functions
+        else{
+            fetchMovies();
+            startOver();
+            newMovie();
+        }
     })
-    
 }
 
-function newMovie(){
-    $('main').on('click', '.new-movie', function(e){
-        e.preventDefault();
-        //$('.buttons, .streaming-list li').remove();
-        $('.streaming-list, .final-buttons').empty();
-        fetchMovies();
-    });
-}
-
-
-
-$(renderQuestionOptions);
+$(renderToDom);
 
 
